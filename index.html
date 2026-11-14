@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#06367b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="AusWeather">
+  <meta name="description" content="AusWeather — Australian live weather forecasts, hourly outlooks, 7-day forecast and rain radar.">
+  <link rel="icon" href="assets/icon-32.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://api.open-meteo.com">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzxJTW6NqF9jG4kRj+gPKwA=" crossorigin="">
+  <title>AusWeather — Australian Weather</title>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#home" aria-label="AusWeather home"><img src="assets/logo-transparent.png" alt=""><span>AusWeather</span></a>
+      <div class="header-actions">
+        <button class="icon-btn" id="headerSearch" aria-label="Search locations" title="Search locations"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg></button>
+        <button class="icon-btn" id="refreshBtn" aria-label="Refresh weather" title="Refresh weather"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.5-2"/></svg></button>
+        <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode"><svg viewBox="0 0 24 24"><path d="M20.3 15.3A8 8 0 0 1 8.7 3.7 8.2 8.2 0 1 0 20.3 15.3Z"/></svg></button>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <div id="notice" class="notice hidden" role="status"></div>
+    <section id="homePanel" class="panel active" aria-label="Current weather">
+      <div class="hero">
+        <div class="hero-top">
+          <button id="locationBtn" class="location-title" aria-label="Choose location"><svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="placeName">Sunshine Coast, QLD</span><span class="chevron">⌄</span></button>
+          <button class="favourite-star" id="heroSave" title="Save location" aria-label="Save location">☆</button>
+        </div>
+        <div class="hero-updated" id="updatedText">Fetching live weather…</div>
+        <div class="hero-main">
+          <div class="hero-temp-row"><span id="temp" class="temperature">--°</span><span id="conditionIcon" class="weather-emoji">🌤️</span></div>
+          <h1 id="condition">Loading weather…</h1>
+          <p id="feelsLike">Feels like --°</p>
+          <span class="sr-only" id="dayNight"></span>
+          <div class="hero-stats">
+            <div class="hero-stat"><span class="stat-icon">♢</span><strong id="heroRain">--%</strong><small>Chance of rain</small></div>
+            <div class="hero-stat"><span class="stat-icon">≋</span><strong id="heroWind">--</strong><small id="heroWindSub">Wind km/h</small></div>
+            <div class="hero-stat"><span class="stat-icon">♧</span><strong id="heroHumidity">--%</strong><small>Humidity</small></div>
+            <div class="hero-stat"><span class="stat-icon">☼</span><strong id="heroUV">--</strong><small>UV index</small></div>
+          </div>
+        </div>
+        <div class="skyline" aria-hidden="true"><svg viewBox="0 0 760 150" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b7e2ff" stop-opacity=".25"/><stop offset="1" stop-color="#053873" stop-opacity=".5"/></linearGradient></defs><path d="M0 114Q190 100 330 113T760 110V150H0Z" fill="url(#water)"/><path d="M0 114h760" stroke="#d7f0ff" stroke-width="1.5" opacity=".6"/><path d="M155 118V86l9-12 8 12v32m22 0V62l8-10 8 10v56m17 0V93l7-8 7 8v25m15 0V77h16v41m20 0V66l9-11 9 11v52m20 0V94h23v24m25 0V83h15v35m20 0V60l7-18 7 18v58m21 0V90h19v28m22 0V81h16v37" fill="#0c3e77" opacity=".35"/><path d="M430 120h275m-250 0c50-77 144-77 200 0m-200-1V72m200 47V72m-190 0h180M482 101h151M504 84h111" fill="none" stroke="#d9efff" stroke-width="3" opacity=".7"/><path d="M45 119l12-30 16 30 17-47 19 47 20-26 18 26M20 120h145" fill="#e4f2fc" stroke="#d9efff" stroke-width="2" opacity=".65"/></svg></div>
+      </div>
+      <div class="home-surface">
+        <div class="today-box"><div class="today-head"><strong>Today</strong><span id="heroRange">Min --° &nbsp; Max --°</span></div><div class="today-content"><span id="todayIcon" class="large-icon">🌤️</span><p id="todaySummary">Getting the latest forecast…</p></div><div class="sun-times" id="sunTimes">Sunrise — · Sunset —</div></div>
+        <div class="section-heading"><h2>Hourly forecast</h2><button class="text-link" data-tab="forecast">See all ›</button></div>
+        <div class="hourly-scroller" id="hourlyPreview"><p class="muted">Loading hourly forecast…</p></div>
+        <div class="section-heading"><h2>7-day forecast</h2><button class="text-link" data-tab="forecast">See all ›</button></div>
+        <div class="week-list" id="weekPreview"></div>
+        <div class="section-heading"><h2>Weather details</h2></div><div class="metrics" id="metrics"></div>
+        <div class="section-heading"><h2>Rain radar</h2><button class="text-link" data-tab="radar">Open radar ›</button></div>
+        <div class="radar-teaser"><span class="radar-symbol">◎</span><div><strong>Track rain near you</strong><p>See recent rain radar images on a map.</p></div><button class="primary small" data-tab="radar">View radar</button></div>
+      </div>
+    </section>
+    <section id="forecastPanel" class="panel" aria-label="Detailed forecast">
+      <div class="page-heading"><h1>Forecast</h1><p id="forecastPlace" class="inlinePlace">Sunshine Coast, QLD</p></div>
+      <div class="forecast-switch" role="tablist" aria-label="Forecast view"><button class="forecast-choice active" data-view="week">7 day</button><button class="forecast-choice" data-view="hours">Hourly</button><button class="forecast-choice" data-view="details">Details</button></div>
+      <div class="forecast-view active" id="viewWeek"><div id="fullWeek" class="week-list forecast-week"></div></div>
+      <div class="forecast-view" id="viewHours"><h2>Next 48 hours</h2><div id="fullHours" class="hourly-table"></div></div>
+      <div class="forecast-view" id="viewDetails"><h2>Weather details</h2><div id="forecastMetrics" class="metrics"></div></div>
+      <p class="disclaimer">Forecasts and current conditions are Open-Meteo model data, not official BOM observations.</p>
+    </section>
+    <section id="radarPanel" class="panel" aria-label="Rain radar">
+      <div class="page-heading"><h1>Radar</h1><p class="inlinePlace">Sunshine Coast, QLD</p></div>
+      <div class="map-card"><div class="map-toolbar"><span id="radarTime">Loading radar…</span><button id="radarReload" class="secondary small">↻ Update</button></div><div id="radarMap" role="application" aria-label="Interactive rainfall radar map"></div><div class="radar-controls"><button id="radarPlay" class="radar-play" aria-label="Play radar animation">▶</button><input id="radarSlider" type="range" min="0" max="0" value="0" aria-label="Radar frame"><span id="radarCounter">--</span></div><div class="radar-legend"><span>Light</span><div class="legend-gradient"></div><span>Heavy</span></div></div>
+      <p class="disclaimer">Recent radar imagery: RainViewer. It is not a prediction. Radar data availability varies.</p>
+      <a class="link-card" href="https://www.bom.gov.au/australia/radar/" target="_blank" rel="noopener">View official BOM rain radar <span>↗</span></a>
+    </section>
+    <section id="warningsPanel" class="panel" aria-label="Weather warnings">
+      <div class="page-heading"><h1>Warnings</h1><p>Official Australian weather alerts</p></div>
+      <div class="warning-banner"><span class="warning-icon">!</span><div><strong>Check official warnings</strong><p>AusWeather does not automatically receive or send BOM severe weather warnings. Use the official links below for current alerts.</p></div></div>
+      <a class="link-card" href="https://www.bom.gov.au/australia/warnings/" target="_blank" rel="noopener">⚠️ &nbsp; BOM warnings Australia-wide <span>↗</span></a>
+      <a class="link-card" href="https://www.bom.gov.au/qld/warnings/" target="_blank" rel="noopener">⚠️ &nbsp; Queensland warnings <span>↗</span></a>
+      <a class="link-card" href="https://www.disaster.qld.gov.au/warnings" target="_blank" rel="noopener">🛡️ &nbsp; Queensland disaster alerts <span>↗</span></a>
+      <div class="content-card"><h2>Stay safe</h2><p>Never enter floodwater. For emergencies call <strong>000</strong>. For SES assistance in Queensland call <strong>132 500</strong>.</p></div>
+    </section>
+    <section id="morePanel" class="panel" aria-label="Settings and locations">
+      <div class="page-heading"><h1>More</h1><p>Locations and settings</p></div>
+      <div class="content-card"><div class="section-heading"><h2>Saved locations</h2><button id="addCityBtn" class="text-link">+ Add</button></div><div id="savedLocations"></div><button id="gpsBtn" class="secondary gps-button">⌖ Use my current location</button></div>
+      <div class="content-card"><h2>Settings</h2><label class="setting-row"><span>Temperature</span><select id="unitsSelect"><option value="c">Celsius (°C)</option><option value="f">Fahrenheit (°F)</option></select></label><label class="setting-row"><span>Appearance</span><select id="appearanceSelect"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><button id="installBtn" class="primary install-btn hidden">Install AusWeather</button><p class="muted tip">On iPhone, open the website in Safari, tap Share, then Add to Home Screen.</p></div>
+      <div class="content-card"><h2>About AusWeather</h2><p>An independent Australian weather app inspired by BOM's layout. Not affiliated with or endorsed by the Bureau of Meteorology.</p><p>Forecast: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · Radar: <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a> · Map: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>.</p><p class="muted">Version 3.0 · Requires internet for live data.</p></div>
+    </section>
+  </main>
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-item selected" data-tab="home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10h-7v-7h-4v7H3z"/></svg><span>Home</span></button>
+    <button class="nav-item" data-tab="forecast"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6m10-6v6M3 10h18M7 14h3m4 0h3M7 18h3"/></svg><span>Forecast</span></button>
+    <button class="nav-item" data-tab="radar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/><path d="M12 12 18 5"/></svg><span>Radar</span></button>
+    <button class="nav-item" data-tab="warnings"><svg viewBox="0 0 24 24"><path d="M10 4 2 19a2 2 0 0 0 2 3h16a2 2 0 0 0 2-3L14 4a2 2 0 0 0-4 0Z"/><path d="M12 9v5m0 4v.5"/></svg><span>Warnings</span></button>
+    <button class="nav-item" data-tab="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>More</span></button>
+  </nav>
+</div>
+<dialog id="searchDialog" class="search-dialog"><div class="dialog-top"><h2>Find a location</h2><button id="closeSearch" class="close-btn" aria-label="Close search">✕</button></div><div class="search-box"><span>⌕</span><input id="cityInput" type="search" placeholder="Search suburb, town or city" autocomplete="off" aria-label="Search for an Australian location"></div><p class="muted search-helper">Search for places across Australia</p><div id="searchResults" class="search-results"></div><div class="search-defaults"><h3>Popular locations</h3><div id="popularCities"></div></div></dialog>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+<script src="app.js" defer></script>
+</body></html>

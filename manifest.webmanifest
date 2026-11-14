@@ -1,0 +1,25 @@
+{
+  "name": "AusWeather \u2014 Australian Weather",
+  "short_name": "AusWeather",
+  "description": "Live Australian weather forecasts, hourly outlooks, 7-day weather and rain radar.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#06367b",
+  "theme_color": "#06367b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
